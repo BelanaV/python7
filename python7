@@ -1,0 +1,42 @@
+OrderID,Product,Quantity,Price,Customer_Segment
+1,Laptop,2.0,1200.50,Corporate
+2,Monitor,1.0,250.00,SMB
+3,Keyboard,NaN,75.99,Retail
+4,Mouse,3.0,NaN,Corporate
+5,Webcam,1.0,50.00,Retail
+OrderID,Product,Quantity,Price,Customer_Segment
+1,Laptop,2.000000,1200.500000,Corporate
+2,Monitor,1.000000,250.000000,SMB
+3,Keyboard,1.666667,75.990000,Retail
+4,Mouse,3.000000,427.427143,Corporate
+5,Webcam,1.000000,50.000000,Retail
+import pandas as pd
+
+# --- Re-create the cleaned DataFrame (df_cleaned) from the previous step ---
+file_path = "sample_sales_data.csv"
+df_loaded = pd.read_csv(file_path)
+
+# Cleaning Step 1: Handle Numerical Missing Values (Quantity and Price)
+mean_quantity = df_loaded['Quantity'].mean()
+mean_price = df_loaded['Price'].mean()
+
+df_cleaned = df_loaded.copy()
+df_cleaned['Quantity'].fillna(mean_quantity, inplace=True)
+df_cleaned['Price'].fillna(mean_price, inplace=True)
+
+# Cleaning Step 2: Handle Categorical Missing Values (Customer_Segment)
+df_cleaned.dropna(subset=['Customer_Segment'], inplace=True)
+
+# --- 1. Compute Basic Statistics (mean, median, std) using .describe() ---
+print("--- Basic Statistics of Numerical Columns ---")
+# Exclude OrderID as it's an identifier
+numerical_stats = df_cleaned[['Quantity', 'Price']].describe()
+print(numerical_stats)
+
+print("\n" + "="*50 + "\n")
+
+# --- 2. Perform Grouping ---
+# Group by 'Customer_Segment' and compute the mean of 'Quantity' and 'Price'
+print("--- Mean Quantity and Price per Customer Segment ---")
+grouped_analysis = df_cleaned.groupby('Customer_Segment')[['Quantity', 'Price']].mean()
+print(grouped_analysis)
